@@ -1,5 +1,8 @@
 class AmortizationEquations:
 
+    def __init__(self):
+        pass
+
     '''
 
     https://www.experts-exchange.com/articles/1948/A-Guide-to-the-PMT-FV-IPMT-and-PPMT-Functions.html
@@ -9,7 +12,7 @@ class AmortizationEquations:
     IPMT: Interest Payment
     '''
 
-    def payment(loan, annual_interest_rate, payments_per_year, total_number_of_payments):
+    def payment(self, loan, annual_interest_rate, payments_per_year, total_number_of_payments):
 
         '''
         https://superuser.com/questions/871404/what-would-be-the-the-mathematical-equivalent-of-this-excel-formula-pmt
@@ -26,12 +29,13 @@ class AmortizationEquations:
         R = APR/payments_per_year
         n = total_number_of_payments
         
+        # payment calculation
         payment = (Pv*R) / (1 - (1 + R)**(-n))
         
         return round(payment, 2)
 
 
-    def interest(annual_interest_rate, payments_per_year, remaining_balance):
+    def interest(self, annual_interest_rate, payments_per_year, remaining_balance):
 
         '''
         https://www.bankrate.com/loans/personal-loans/how-to-calculate-loan-interest/
@@ -42,14 +46,14 @@ class AmortizationEquations:
         return round(interest, 2)
 
 
-    def payment_breakdown(loan, annual_interest_rate, payments_per_year, total_number_of_payments, remaining_balance):
+    def payment_breakdown(self, loan, annual_interest_rate, payments_per_year, total_number_of_payments, remaining_balance):
 
         '''
         IMPLEMENT APPROPRIATE PPMT EQN
         '''
 
-        payment = AmortizationEquations.payment(loan, annual_interest_rate, payments_per_year, total_number_of_payments)
-        interest = AmortizationEquations.interest(annual_interest_rate, payments_per_year, remaining_balance)
+        payment = self.payment(loan, annual_interest_rate, payments_per_year, total_number_of_payments)
+        interest = self.interest(annual_interest_rate, payments_per_year, remaining_balance)
 
         principal = payment-interest
 

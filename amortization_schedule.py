@@ -6,8 +6,6 @@ from amortization_eqns import *
 class AmortizationSchedule:
 
     def __init__(self, asking, loan, annual_interest_rate, payments_per_year, loan_term, save_dir=os.getcwd()):
-        
-        self.amort_eqns = AmortizationEquations
 
         '''
         loan: Initial loan amount
@@ -32,13 +30,15 @@ class AmortizationSchedule:
 
     def amort_schedule(self):
 
+        amort_eqns_class = AmortizationEquations()
+
         payment_number=0
         while self.remaining_balance >= 0:
 
             month = payment_number%12+1
             payment_number+=1
 
-            payment_breakdown = self.amort_eqns.payment_breakdown(
+            payment_breakdown = amort_eqns_class.payment_breakdown(
                 loan=self.loan, 
                 annual_interest_rate=self.annual_interest_rate, 
                 payments_per_year=self.payments_per_year, 
