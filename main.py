@@ -65,8 +65,4 @@ for asking in prices:
                 loan_summary=loan_summary_class.summary,
                 dir_path=dir_path
                 )
-
-            loan_summary_vis.percentage_breakdown()
-            loan_summary_vis.payment_breakdown()
-            loan_summary_vis.total_breakdown()
-                
+            loan_summary_vis.main()

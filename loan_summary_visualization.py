@@ -27,7 +27,6 @@ class LoanSummaryVisualization:
 
         fig, ax = plt.subplots()
 
-
         ax_cols = [6, 4]
         ax_color = ['red', 'green']
         
@@ -56,7 +55,6 @@ class LoanSummaryVisualization:
     def payment_breakdown(self):
 
         fig, ax = plt.subplots()
-
 
         ax_cols = [5, 3]
         ax_color = ['red', 'green']
@@ -119,3 +117,12 @@ class LoanSummaryVisualization:
 
         self.save_figure(file_name = 'totals_breakdown', fig=fig)
         return fig, ax
+    
+
+
+    def main(self):
+        
+        self.percentage_breakdown()
+        self.payment_breakdown()
+        self.total_breakdown()
+            
