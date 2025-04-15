@@ -1,4 +1,4 @@
-class AmortizationEqns:
+class AmortizationEquations:
 
     '''
 
@@ -12,7 +12,6 @@ class AmortizationEqns:
     def payment(loan, annual_interest_rate, payments_per_year, total_number_of_payments):
 
         '''
-
         https://superuser.com/questions/871404/what-would-be-the-the-mathematical-equivalent-of-this-excel-formula-pmt
 
         Pv: Present Value
@@ -49,8 +48,8 @@ class AmortizationEqns:
         IMPLEMENT APPROPRIATE PPMT EQN
         '''
 
-        payment = AmortizationEqns.payment(loan, annual_interest_rate, payments_per_year, total_number_of_payments)
-        interest = AmortizationEqns.interest(annual_interest_rate, payments_per_year, remaining_balance)
+        payment = AmortizationEquations.payment(loan, annual_interest_rate, payments_per_year, total_number_of_payments)
+        interest = AmortizationEquations.interest(annual_interest_rate, payments_per_year, remaining_balance)
 
         principal = payment-interest
 

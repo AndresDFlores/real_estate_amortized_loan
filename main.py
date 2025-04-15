@@ -1,125 +1,72 @@
-import pandas as pd
 import os
 
 from scrape_mortgage_rates import *
-
 from amortization_schedule import *
 from loan_summary import *
 from loan_summary_visualization import *
 
 
-# #  -----DEV-----
-
-# from guis import *
-
-# guis_class=GUIs()
-
-# fields = {
-#     'Address':str, 
-#     'Asking Price ($)':float, 
-#     'Percent Down (%)':float, 
-#     'APR (%)':float, 
-#     'Payments per Year':int, 
-#     'Loan Term (Years)':int
-#     }
-
-# user_entries = guis_class.dialogue_box(fields=list(fields))
-# save_dir = guis_class.select_directory()
-
-# for field, dtype in fields.items():
-#     user_entries[field]=dtype(user_entries[field])
-
-
-# amort_calcs = AmortizationSchedule(
-#     asking=user_entries[list(fields)[1]],
-#     loan=user_entries[list(fields)[1]]-(user_entries[list(fields)[1]]*user_entries[list(fields)[2]]),
-#     annual_interest_rate=user_entries[list(fields)[3]],
-#     payments_per_year=user_entries[list(fields)[4]],
-#     loan_term=user_entries[list(fields)[5]]
-# )
-
-# # -----DEV-----
-
+#  saving directory
 main_dir = os.getcwd()
-# mortgage_rates_class = RateScrape()
 
-# term_rates = {term: mortgage_rates_class.scrape_rates(loan_term=term) for term in [15, 30]}
-# prices = [350, 355, 360, 365, 370]
-
-# print(term_rates)
-
-term_rates={30: 6.75}
-prices=[830, 840, 850]
-
-comps_summary=dict(
-    asking=[],
-    term=[],
-    apr=[],
-    avg_monthly=[],
-    total_loan = [],
-    total_to_pay=[],
-    total_principal=[],
-    total_interest=[],
-    principal_percent=[],
-    interest_percent=[],
-    percent_increase=[]
-)
+prices = [100]  # asking in thousands , 840, 850
+loan_terms = [30]  # years
+percent_down = [.20]  # percent of asking down payment
 
 
-for price in prices:
-    for term, apr in term_rates.items():
-
-        #  create summary directory
-        file_name = f'{price}k_{apr}%_{term}yrs'
-        dir_path = os.path.join(os.getcwd(), file_name)
-
-        if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
+rate_scrape =  RateScrape()
+for asking in prices:
+    for term in loan_terms:
+        for dp in percent_down:
 
 
-        #  AMORTIZATION SCHEDULE
-        asking = price*1000
-        loan = asking-(asking*(.15))
+            #  LOAN TERMS
+            loan = asking-(asking*dp)
+            apr = rate_scrape.scrape_rates(loan_term=term)
+            
 
-        amort_calcs = AmortizationSchedule(
-            asking=asking,
-            loan=loan,
-            annual_interest_rate=apr,
-            payments_per_year=12,
-            loan_term=term
-        )
+        
+            #  create summary directory
+            file_name = f'{asking}k_{dp*100}%dp_{loan}K_{apr}%_{term}yrs'
+            dir_path = os.path.join(os.getcwd(), file_name)
 
-        amort_schedule = amort_calcs.amort_schedule()
-        amort_schedule.to_excel(os.path.join(dir_path, 'ammortization_schedule.xlsx'), index=False)
-
-
-        #  LOAN SUMMARY
-        summary = LoanSummary(
-            #term=term,
-            apr=apr,
-            loan=amort_calcs.loan, 
-            amortization_table=amort_schedule
-            ).summary()
-
-
-        comps_summary['asking'].append(asking)
-        for summary_item in list(summary):
-            comps_summary[summary_item].append(summary[summary_item])
+            if not os.path.exists(dir_path):
+                os.mkdir(dir_path)
 
 
 
-        #  AMORTIZATION VISUALIZATION
-        loan_summary_vis = LoanSummaryVisualization(
-            amortization_table=amort_schedule,
-            loan_summary=summary,
-            dir_path=dir_path
+            #  AMORTIZATION SCHEDULE           
+            amort_sched_class = AmortizationSchedule(
+                asking=asking*1000,
+                loan=loan*1000,
+                annual_interest_rate=apr,
+                payments_per_year=12,
+                loan_term=term,
+                save_dir=dir_path
             )
-
-        loan_summary_vis.percentage_breakdown()
-        loan_summary_vis.payment_breakdown()
-        loan_summary_vis.total_breakdown()
+            amort_sched_class.main()
 
 
-df = pd.DataFrame(comps_summary)
-# df.to_excel(os.path.join(main_dir, 'comps_summary.xlsx'), index=False)
-print(df)
+
+            #  LOAN SUMMARY
+            loan_summary_class = LoanSummary(
+                #term=term,
+                apr=apr,
+                loan=amort_sched_class.loan, 
+                amortization_table=amort_sched_class.amort_table
+                )
+            loan_summary_class.get_summary()
+
+
+
+            #  AMORTIZATION VISUALIZATION
+            loan_summary_vis = LoanSummaryVisualization(
+                amortization_table=amort_sched_class.amort_table,
+                loan_summary=loan_summary_class.summary,
+                dir_path=dir_path
+                )
+
+            loan_summary_vis.percentage_breakdown()
+            loan_summary_vis.payment_breakdown()
+            loan_summary_vis.total_breakdown()
+                

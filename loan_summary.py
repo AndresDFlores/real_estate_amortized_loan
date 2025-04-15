@@ -1,4 +1,4 @@
-# from symbol import term
+from operator import itemgetter
 
 
 class LoanSummary:
@@ -10,22 +10,26 @@ class LoanSummary:
         self.amortization_table = amortization_table
 
 
-    def summary(self):
+    def get_summary(self):
 
         summary=dict()
 
-        avg_monthly = round(self.amortization_table['PAYMENT'].sum()/len(self.amortization_table['PAYMENT']), 2)
-        total_to_pay = round(self.amortization_table['PAYMENT'].sum(), 2)
-        total_principal = round(self.amortization_table['PRINCIPAL'].sum(), 2)
-        total_interest = round(self.amortization_table['INTEREST'].sum(), 2)
+        payment_data = list(map(itemgetter(2), self.amortization_table))
+        avg_monthly = round(sum(payment_data)/len(payment_data), 2)
+        total_to_pay = round(sum(payment_data), 2)
+
+        principal_data = list(map(itemgetter(3), self.amortization_table))
+        total_principal = round(sum(principal_data), 2)
+
+        interest_data = list(map(itemgetter(5), self.amortization_table))
+        total_interest = round(sum(interest_data), 2)
 
         principal_percent = (total_principal/total_to_pay)*100
         interest_percent = (total_interest/total_to_pay)*100
         percent_increase = ((total_to_pay-self.loan)/self.loan)*100  # ((new-original)/original)*100
 
 
-        summary=dict(
-            # term = self.term,
+        self.summary=dict(
             apr = self.apr,
             avg_monthly = avg_monthly,
             total_loan = self.loan,
@@ -37,5 +41,3 @@ class LoanSummary:
             percent_increase=percent_increase
         )
         
-
-        return summary

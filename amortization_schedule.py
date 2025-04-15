@@ -1,11 +1,13 @@
-import pandas as pd
+import os
+import csv
 from amortization_eqns import *
+
 
 class AmortizationSchedule:
 
-    def __init__(self, asking, loan, annual_interest_rate, payments_per_year, loan_term):
+    def __init__(self, asking, loan, annual_interest_rate, payments_per_year, loan_term, save_dir=os.getcwd()):
         
-        self.amort_eqns = AmortizationEqns
+        self.amort_eqns = AmortizationEquations
 
         '''
         loan: Initial loan amount
@@ -17,6 +19,7 @@ class AmortizationSchedule:
         self.asking=asking
         self.loan=loan
         self.annual_interest_rate=annual_interest_rate/100  # divide by 100 to convert from percent to decimal
+
         self.payments_per_year=payments_per_year
         self.loan_term=loan_term
 
@@ -24,6 +27,7 @@ class AmortizationSchedule:
         self.remaining_balance = self.loan  # this can be a class method
 
         self.amort_table = []
+        self.save_dir=save_dir
 
 
     def amort_schedule(self):
@@ -52,11 +56,15 @@ class AmortizationSchedule:
 
             self.remaining_balance = self.remaining_balance-principal
 
-            percent_paid = 100-(self.remaining_balance/self.loan)*100  # percentage of loan paid
-            percent_owned = 100-(self.remaining_balance/self.asking)*100  # percentage asking price paid
+            # percentage of loan paid
+            percent_paid = 100-(self.remaining_balance/self.loan)*100
+
+            # percentage asking price paid
+            percent_owned = 100-(self.remaining_balance/self.asking)*100  
             
+            #  list of tuples, where each tuple is a row of data
             self.amort_table.append(
-                [
+                (
                     payment_number,
                     month,
                     payment, 
@@ -67,11 +75,11 @@ class AmortizationSchedule:
                     self.remaining_balance, 
                     percent_paid,
                     percent_owned
-                ]
+                )
             )
 
-        amort_table = pd.DataFrame(
-            self.amort_table, columns=[
+        #  define column names
+        self.column_headers = [
                 'PAYMENT_NUMBER',
                 'MONTH',
                 'PAYMENT', 
@@ -82,19 +90,41 @@ class AmortizationSchedule:
                 'REMAINING_BALANCE', 
                 'PERCENT_OF_LOAN_PAID',
                 'PERCENT_OF_ASSET_OWNED'
-            ]
-        )
+                ]
 
-        return amort_table
+
+    def export_amortization_schedule(self):
+            
+
+            # Specify the CSV file name
+            filename = os.path.join(self.save_dir, 'ammortization_schedule.csv')
+            
+
+
+            # Open the file in write mode ('w')
+            with open(filename, 'w', newline='') as file:
+                writer = csv.writer(file)
+
+                # Write the header row (optional)
+                writer.writerow(self.column_headers)
+
+                # Write the data rows
+                writer.writerows(self.amort_table)
+
+
+    def main(self):
+        self.amort_schedule()
+        self.export_amortization_schedule()
+
 
 if __name__ == '__main__':
 
     amort_calcs = AmortizationSchedule(
-        asking=140000,
-        loan=115800, 
-        annual_interest_rate=3.25, 
+        asking=100000,
+        loan=80000, 
+        annual_interest_rate=3, 
         payments_per_year = 12,
-        loan_term = 15
+        loan_term = 30
         )
-
-    print(amort_calcs.amort_schedule())
+    
+    amort_calcs.main()
